@@ -7,11 +7,20 @@
       flex-direction: column;
       height: 100%;
     }
+    .video-container {
+      min-height: 1;
+      flex-grow: 1;
+    }
+    #video {
+      height: 100%;
+    }
     </style>
   </head>
   <body>
     <div id="root">
-      <video controls id="video"></video>
+      <div class="video-container">
+        <video controls id="video"></video>
+      </div>
       <div>
         <input id="duration" type="number" placeholder="Duration">
         <button id="setduration">Set duration</button>
