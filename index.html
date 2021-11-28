@@ -1,0 +1,57 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <style>
+    #root {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <video controls id="video"></video>
+      <div>
+        <input id="duration" type="number" placeholder="Duration">
+        <button id="setduration">Set duration</button>
+      </div>
+      <div>
+        <input id="input" type="file">
+        <button id="add">Add input to sourceBuffer with MIME: video/mp4; codecs="avc1.640033"</button>
+      </div>
+    </div>
+
+    <script>
+      var mediaSource = new MediaSource();
+      var sourceBuffer;
+      video.src = URL.createObjectURL(mediaSource);
+      video.addEventListener("canplay", function() {
+        console.log("Media is now playable");
+        video.play();
+      });
+      mediaSource.addEventListener("sourceopen", function() {
+        URL.revokeObjectURL(video.src);
+        sourceBuffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.640033"');
+        sourceBuffer.addEventListener("updateend", function() {
+          console.log("updateend: append to buffer success");
+          for (var i = 0; i < sourceBuffer.buffered.length; i++) {
+            console.log(`Buffered range start ${sourceBuffer.buffered.start(i)}, end ${sourceBuffer.buffered.end(i)}`);
+          }
+        });
+        sourceBuffer.addEventListener("error", function() {
+          console.log("error: An error occured when appending to sourceBuffer. Use chrome devtools to find out.");
+        });
+      }, { once: true });
+      add.addEventListener("click", function() {
+        input.files[0].arrayBuffer().then(function(buffer) {
+          console.log("Appending to sourceBuffer with mode", sourceBuffer.mode);
+          sourceBuffer.appendBuffer(buffer);
+        });
+      });
+      setduration.addEventListener("click", function() {
+        mediaSource.duration = duration.value;
+      });
+    </script>
+  </body>
+</html>
